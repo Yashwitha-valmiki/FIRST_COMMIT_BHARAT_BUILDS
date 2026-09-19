@@ -2,11 +2,12 @@
 import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { logout, whoAmI } from "@/lib/auth";
+import Navbar from "@/components/Navbar";
 
 export default function HomePage() {
   const [text, setText] = useState("Agreement includes lock-in and penalty.");
   const [result, setResult] = useState<any>(null);
-  const [docId, setDocId] = useState("doc_" + Date.now());
+  const [docId] = useState("doc_" + Date.now());
   const [userInfo, setUserInfo] = useState<string>("");
 
   async function me() {
@@ -24,6 +25,7 @@ export default function HomePage() {
 
   return (
     <main style={{ padding: 24 }}>
+      <Navbar />
       <h1>RiskLens</h1>
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <a href="/login"><button>Login</button></a>

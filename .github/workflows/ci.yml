@@ -1,8 +1,5 @@
 name: CI
-
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   build-test:
@@ -15,3 +12,4 @@ jobs:
       - run: npm install
       - run: npm --workspace services/api run build
       - run: npm --workspace apps/web run build
+      - run: node -e "console.log('CI basic checks passed')"

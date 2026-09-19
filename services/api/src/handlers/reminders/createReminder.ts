@@ -1,23 +1,31 @@
 import { Request, Response } from "express";
+import { createOneTimeReminder } from "../../domain/reminders/scheduler.js";
 
-/**
- * TODO: integrate EventBridge Scheduler + SES.
- */
 export async function createReminder(req: Request, res: Response) {
   try {
     const { documentId, remindAt, email, note } = req.body || {};
     if (!documentId || !remindAt || !email) {
       return res.status(400).json({ message: "documentId, remindAt, email required" });
     }
-    return res.status(201).json({
-      reminderId: `rem_${Date.now()}`,
-      documentId,
-      remindAt,
-      email,
-      note: note || "",
-      status: "SCHEDULED_STUB"
+
+    const targetArn = process.env.REMINDER_TARGET_ARN;
+    const roleArn = process.env.SCHEDULER_ROLE_ARN;
+    if (!targetArn || !roleArn) {
+      return res.status(500).json({ message: "Reminder infra env missing" });
+    }
+
+    const scheduleName = `risklens-rem-${documentId}-${Date.now()}`;
+    await createOneTimeReminder({
+      scheduleName,
+      atIso: new Date(remindAt).toISOString(),
+      targetArn,
+      roleArn,
+      payload: { documentId, email, note: note || "" }
     });
-  } catch (e) {
-    return res.status(500).json({ message: "failed to create reminder" });
+
+    return res.status(201).json({ reminderId: scheduleName, status: "SCHEDULED" });
+  } catch (e:any) {
+    console.error(e);
+    return res.status(500).json({ message: e?.message || "failed to create reminder" });
   }
 }
