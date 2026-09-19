@@ -23,7 +23,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
       { Effect="Allow", Action=["textract:AnalyzeDocument","textract:DetectDocumentText"], Resource="*" },
       { Effect="Allow", Action=["bedrock:InvokeModel"], Resource="*" },
       { Effect="Allow", Action=["scheduler:CreateSchedule"], Resource="*" },
-      { Effect="Allow", Action=["iam:PassRole"], Resource="*" }
+      { Effect="Allow", Action=["iam:PassRole"], Resource=[aws_iam_role.scheduler_invoke_role.arn] }
     ]
   })
 }
@@ -48,8 +48,8 @@ resource "aws_lambda_function" "api" {
       CORS_ORIGIN           = var.web_origin
       COGNITO_USER_POOL_ID  = aws_cognito_user_pool.pool.id
       COGNITO_APP_CLIENT_ID = aws_cognito_user_pool_client.client.id
-      REMINDER_TARGET_ARN   = var.reminder_target_arn
-      SCHEDULER_ROLE_ARN    = var.scheduler_role_arn
+      REMINDER_TARGET_ARN   = aws_sqs_queue.reminder_queue.arn
+      SCHEDULER_ROLE_ARN    = aws_iam_role.scheduler_invoke_role.arn
     }
   }
 

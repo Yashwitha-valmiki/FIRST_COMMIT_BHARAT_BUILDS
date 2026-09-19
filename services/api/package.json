@@ -7,7 +7,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/local.js",
     "bundle:lambda": "node scripts/bundle-lambda.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preflight": "node scripts/preflight.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.637.0",
@@ -32,6 +33,8 @@
     "typescript": "^5.6.2",
     "@types/cors": "^2.8.17",
     "esbuild": "^0.24.0",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.1",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.3"
   }
 }

@@ -4,12 +4,21 @@ on: [push, pull_request]
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      DOCUMENT_BUCKET: ci-bucket
+      DDB_TABLE_DOCUMENTS: Documents
+      DDB_TABLE_RISKS: RiskAssessments
+      BEDROCK_MODEL_ID: amazon.titan-text-express-v1
+      COGNITO_USER_POOL_ID: us-east-1_dummy
+      COGNITO_APP_CLIENT_ID: dummyclientid
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm install
+      - run: npm --workspace services/api run preflight
       - run: npm --workspace services/api run build
       - run: npm --workspace services/api run test
       - run: npm --workspace apps/web run build
