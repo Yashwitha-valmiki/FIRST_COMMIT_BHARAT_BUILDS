@@ -1,0 +1,9 @@
+- [ ] Hosted UI login works
+- [ ] Upload URL + S3 upload works
+- [ ] Analyze endpoint returns valid schema
+- [ ] Risk score + color displayed
+- [ ] Report export works
+- [ ] Reminder endpoint works
+- [ ] Privacy/Terms/Disclaimer pages linked
+- [ ] CI passes on latest commit
+- [ ] Demo recorded (2-5 min)
