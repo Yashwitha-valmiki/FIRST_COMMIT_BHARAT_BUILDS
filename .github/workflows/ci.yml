@@ -11,5 +11,5 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npm --workspace services/api run build
+      - run: npm --workspace services/api run test
       - run: npm --workspace apps/web run build
-      - run: node -e "console.log('CI basic checks passed')"
