@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 export default function HomePage() {
-  const [text, setText] = useState("This agreement has lock-in and penalty.");
+  const [text, setText] = useState("Agreement includes lock-in and penalty.");
   const [result, setResult] = useState<any>(null);
 
   async function analyze() {
@@ -11,8 +11,7 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, role: "student", language: "en" })
     });
-    const data = await res.json();
-    setResult(data);
+    setResult(await res.json());
   }
 
   return (
