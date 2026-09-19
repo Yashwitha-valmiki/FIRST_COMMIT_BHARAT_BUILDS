@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { runAnalysisPipeline } from "../../domain/analysis/runAnalysisPipeline.js";
+import { assertValidAnalysis } from "../../lib/validator.js";
+import { saveRisk } from "../../repositories/riskRepository.js";
 
 export async function analyzeDocument(req: Request, res: Response) {
   try {
@@ -12,10 +14,12 @@ export async function analyzeDocument(req: Request, res: Response) {
       outputLanguage: language || "en"
     });
 
-    // TODO: persist result in DDB (RiskAssessments table)
+    assertValidAnalysis(result);
+    await saveRisk(documentId, { documentId, ...result });
+
     return res.status(200).json({ documentId, ...result });
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
-    return res.status(500).json({ message: "analysis failed" });
+    return res.status(500).json({ message: e?.message || "analysis failed" });
   }
 }
