@@ -10,20 +10,20 @@ export async function loginHostedUI() {
 export async function handleAuthCallbackAndStoreToken() {
   configureAmplify();
   const session = await fetchAuthSession();
-  const token = session.tokens?.accessToken?.toString();
-  if (!token) throw new Error("No access token after callback");
-  localStorage.setItem("access_token", token);
+  const token = session.tokens?.idToken?.toString();
+  if (!token) throw new Error("No id token after callback");
+  localStorage.setItem("id_token", token);
   return token;
 }
 
-export async function getAccessToken() {
+export async function getIdToken() {
   configureAmplify();
-  const local = localStorage.getItem("access_token");
+  const local = localStorage.getItem("id_token");
   if (local) return local;
   const session = await fetchAuthSession();
-  const token = session.tokens?.accessToken?.toString();
+  const token = session.tokens?.idToken?.toString();
   if (!token) return null;
-  localStorage.setItem("access_token", token);
+  localStorage.setItem("id_token", token);
   return token;
 }
 
@@ -34,6 +34,6 @@ export async function whoAmI() {
 
 export async function logout() {
   configureAmplify();
-  localStorage.removeItem("access_token");
+  localStorage.removeItem("id_token");
   await signOut();
 }

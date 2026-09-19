@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "../lib/cognitoVerifier.js";
+import { verifyIdToken } from "../lib/cognitoVerifier.js";
 
 export async function authGuard(req: Request, res: Response, next: NextFunction) {
   try {
@@ -9,15 +9,15 @@ export async function authGuard(req: Request, res: Response, next: NextFunction)
     }
 
     const token = header.slice("Bearer ".length).trim();
-    const payload = await verifyAccessToken(token);
+    const payload = await verifyIdToken(token);
 
     (req as any).user = {
       sub: payload.sub,
-      username: payload.username || payload.client_id || "unknown"
+      email: (payload as any).email || null
     };
 
     return next();
-  } catch (e) {
+  } catch {
     return res.status(401).json({ message: "Invalid token" });
   }
 }

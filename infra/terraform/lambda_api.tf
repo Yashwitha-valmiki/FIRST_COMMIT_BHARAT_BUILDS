@@ -21,7 +21,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
       { Effect="Allow", Action=["s3:GetObject","s3:PutObject"], Resource=["${aws_s3_bucket.documents.arn}/*"] },
       { Effect="Allow", Action=["dynamodb:GetItem","dynamodb:PutItem","dynamodb:UpdateItem","dynamodb:Query","dynamodb:Scan"], Resource=[aws_dynamodb_table.documents.arn, aws_dynamodb_table.risks.arn] },
       { Effect="Allow", Action=["textract:AnalyzeDocument","textract:DetectDocumentText"], Resource="*" },
-      { Effect="Allow", Action=["bedrock:InvokeModel"], Resource="*" }
+      { Effect="Allow", Action=["bedrock:InvokeModel"], Resource="*" },
+      { Effect="Allow", Action=["scheduler:CreateSchedule"], Resource="*" },
+      { Effect="Allow", Action=["iam:PassRole"], Resource="*" }
     ]
   })
 }
@@ -29,7 +31,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 resource "aws_lambda_function" "api" {
   function_name = "${var.project_name}-api"
   role          = aws_iam_role.lambda_role.arn
-  handler       = "dist/lambda.handler"
+  handler       = "lambda.handler"
   runtime       = "nodejs20.x"
   timeout       = 30
 
@@ -38,14 +40,16 @@ resource "aws_lambda_function" "api" {
 
   environment {
     variables = {
-      AWS_REGION             = var.aws_region
-      DOCUMENT_BUCKET        = aws_s3_bucket.documents.bucket
-      DDB_TABLE_DOCUMENTS    = aws_dynamodb_table.documents.name
-      DDB_TABLE_RISKS        = aws_dynamodb_table.risks.name
-      BEDROCK_MODEL_ID       = "amazon.titan-text-express-v1"
-      CORS_ORIGIN            = var.web_origin
-      COGNITO_USER_POOL_ID   = aws_cognito_user_pool.pool.id
-      COGNITO_APP_CLIENT_ID  = aws_cognito_user_pool_client.client.id
+      AWS_REGION            = var.aws_region
+      DOCUMENT_BUCKET       = aws_s3_bucket.documents.bucket
+      DDB_TABLE_DOCUMENTS   = aws_dynamodb_table.documents.name
+      DDB_TABLE_RISKS       = aws_dynamodb_table.risks.name
+      BEDROCK_MODEL_ID      = "amazon.titan-text-express-v1"
+      CORS_ORIGIN           = var.web_origin
+      COGNITO_USER_POOL_ID  = aws_cognito_user_pool.pool.id
+      COGNITO_APP_CLIENT_ID = aws_cognito_user_pool_client.client.id
+      REMINDER_TARGET_ARN   = var.reminder_target_arn
+      SCHEDULER_ROLE_ARN    = var.scheduler_role_arn
     }
   }
 
